@@ -118,32 +118,29 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-driver = webdriver.Chrome()
-driver.maximize_window()
-driver.get("https://practice.automationtesting.in/")
-driver.implicitly_wait(5)
 
-shop_tab = driver.find_element_by_id("menu-item-40").click()
-mastering_js_book = driver.find_element_by_class_name("post-165").click()
-add_to_basket = driver.find_element_by_class_name("single_add_to_cart_button ").click()
-cart_contents = driver.find_element_by_class_name("cartcontents")
-cart_contents_text = cart_contents.text
-amount = driver.find_element_by_css_selector("#wpmenucartli .amount")
-amount_text = amount.text
-assert cart_contents_text == "1 item"
-assert amount_text == "₹350.00"
-subtotal = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, ".cart-subtotal .amount")))
-if subtotal is not None:
-    print("Subtotal отобразилась стоимость")
-else:
-    print("Стоимость не отобразилась")
-total = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, ".order-total .amount")))
-if total is not None:
-    print("Total отобразилась стоимость")
-else:
-    print("Стоимость не отобразилась")
+driver = webdriver.Chrome()
+driver.get("http://practice.automationtesting.in/")
+driver.implicitly_wait(5)
+driver.maximize_window()
+shop_tab = driver.find_element_by_link_text("Shop")
+shop_tab.click()
+html5_webapp_development_book = driver.find_element_by_css_selector(".post-182 > a h3")
+html5_webapp_development_book.click()
+html5_webapp_development_book_add_btn = driver.find_element_by_css_selector(".single_add_to_cart_button")
+html5_webapp_development_book_add_btn.click()
+basket_item_value = driver.find_element_by_css_selector(".wpmenucart-contents .cartcontents")
+basket_item_value_text = basket_item_value.text
+assert basket_item_value_text == "1 Item"
+basket_price_value = driver.find_element_by_css_selector(".wpmenucart-contents .amount")
+basket_price_value_text = basket_price_value.text
+assert basket_price_value_text == "₹180.00"
+basket_btn = driver.find_element_by_class_name("wpmenucart-contents")
+basket_btn.click()
+subtotal_price = WebDriverWait(driver, 10).until(
+    EC.text_to_be_present_in_element((By.CSS_SELECTOR, ".cart-subtotal .woocommerce-Price-amount"), "₹180.00"))
+total_price = WebDriverWait(driver, 10).until(
+    EC.text_to_be_present_in_element((By.CSS_SELECTOR, ".order-total .woocommerce-Price-amount"), "₹189.00"))
 driver.quit()
 
 
@@ -153,35 +150,39 @@ driver.quit()
 from selenium import webdriver
 import time
 driver = webdriver.Chrome()
-driver.maximize_window()
-driver.get("https://practice.automationtesting.in/")
+driver.get("http://practice.automationtesting.in/")
 driver.implicitly_wait(5)
+driver.maximize_window()
 
-shop_tab = driver.find_element_by_id("menu-item-40").click()
+shop_tab = driver.find_element_by_link_text("Shop")
+shop_tab.click()
 driver.execute_script("window.scrollBy(0, 300);")
-mastering_js_book = driver.find_element_by_class_name("post-165").click()
-add_to_basket = driver.find_element_by_class_name("single_add_to_cart_button ").click()
-time.sleep(1)
-cart = driver.find_element_by_class_name("wpmenucart-icon-shopping-cart-0").click()
-time.sleep(1)
-remove_book = driver.find_element_by_class_name("remove")
-time.sleep(2)
-remove_book.click()
-undo = driver.find_element_by_link_text("Undo?").click()
-quantity = driver.find_element_by_class_name("qty").clear()
-time.sleep(2)
-quantity = driver.find_element_by_class_name("qty").send_keys("3")
-update_basket = driver.find_element_by_css_selector("td> input.button").click()
+html5_webapp_development_book = driver.find_element_by_css_selector(".post-182 .add_to_cart_button")
+html5_webapp_development_book.click()
+time.sleep(3)
+html5_webapp_development_book = driver.find_element_by_css_selector(".post-180 .add_to_cart_button")
+html5_webapp_development_book.click()
+basket_btn = driver.find_element_by_class_name("wpmenucart-contents")
+basket_btn.click()
 time.sleep(5)
-quantity_value = driver.find_element_by_class_name("qty")
-quantity_value_text = quantity_value.text
-assert quantity_value_text == "3"
-apply_coupon_btn = driver.find_element_by_css_selector(".coupon > input.button")
+remove_first_item_btn = driver.find_element_by_class_name("remove")
+remove_first_item_btn.click()
+undo_btn = driver.find_element_by_link_text("Undo?")
+undo_btn.click()
+quantity_field = driver.find_element_by_css_selector("tbody > tr:nth-child(1) .product-quantity input")
+quantity_field.clear()
+quantity_field.send_keys("3")
+update_basket = driver.find_element_by_name("update_cart")
+update_basket.click()
+quantity_field = driver.find_element_by_css_selector("tbody > tr:nth-child(1) .product-quantity input")
+quantity_field_value = quantity_field.get_attribute("value")
+assert quantity_field_value == '3'
 time.sleep(5)
-apply_coupon_btn.click()
-error_code = driver.find_element_by_class_name("woocommerce-error")
-error_code_text = error_code.text
-assert error_code_text == "Please enter a coupon code."
+apply_coupon = driver.find_element_by_name("apply_coupon")
+apply_coupon.click()
+error_message = driver.find_element_by_css_selector(".woocommerce-error")
+error_message_text = error_message.text
+assert error_message_text == 'Please enter a coupon code.'
 driver.quit()
 
 
@@ -206,8 +207,7 @@ cart = driver.find_element_by_class_name("wpmenucart-icon-shopping-cart-0").clic
 proceed_to_checkout = WebDriverWait(driver, 10).until(
     EC.element_to_be_clickable((By.CLASS_NAME, "checkout-button"))).click()
 first_name = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.ID, "billing_first_name"))
-)
+    EC.presence_of_element_located((By.ID, "billing_first_name")))
 first_name.send_keys("IVAN")
 last_name = driver.find_element_by_id("billing_last_name")
 last_name.send_keys("IVANOV")
@@ -232,9 +232,7 @@ time.sleep(3)
 payments = driver.find_element_by_css_selector("input[type='radio'][value='cheque']").click()
 place_order = driver.find_element_by_id("place_order").click()
 order_received_text = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.XPATH, '//p[@class="woocommerce-thankyou-order-received"][text()="Thank you. Your order has been received."]'))
-)
+    EC.presence_of_element_located((By.XPATH, '//p[@class="woocommerce-thankyou-order-received"][text()="Thank you. Your order has been received."]')))
 check_payments_text = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.XPATH, "//tr[3]/td[text()='Check Payments']"))
-)
+    EC.presence_of_element_located((By.XPATH, "//tr[3]/td[text()='Check Payments']")))
 driver.quit()
